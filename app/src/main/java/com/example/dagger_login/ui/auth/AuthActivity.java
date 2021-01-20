@@ -1,6 +1,5 @@
 package com.example.dagger_login.ui.auth;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -16,8 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.bumptech.glide.RequestManager;
-import com.example.dagger_login.BaseActivity;
-import com.example.dagger_login.MainActivity;
+import com.example.dagger_login.ui.main.MainActivity;
 import com.example.dagger_login.R;
 import com.example.dagger_login.models.User;
 import com.example.dagger_login.viewmodels.ViewModelProviderFactory;
@@ -26,23 +24,24 @@ import javax.inject.Inject;
 
 import dagger.android.support.DaggerAppCompatActivity;
 
-public class AuthActivity  extends DaggerAppCompatActivity implements View.OnClickListener {
+public class AuthActivity extends DaggerAppCompatActivity implements View.OnClickListener {
 
-private static final String TAG = "AuthActivity";
+    private static final String TAG = "AuthActivity";
 
-private AuthViewModel viewModel;
+    private AuthViewModel viewModel;
 
-private EditText userId;
-private ProgressBar progressBar;
+    private EditText userId;
+    private ProgressBar progressBar;
 
-@Inject
-ViewModelProviderFactory providerFactory;
+    @Inject
+    ViewModelProviderFactory providerFactory;
 
-@Inject
-Drawable logo;
+    @Inject
+    Drawable logo;
 
-@Inject
-RequestManager requestManager;
+    @Inject
+    RequestManager requestManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,33 +58,34 @@ RequestManager requestManager;
         subscribeObservers();
 
     }
-    private void subscribeObservers(){
+
+    private void subscribeObservers() {
         viewModel.observeAuthState().observe(this, new Observer<AuthResource<User>>() {
             @Override
             public void onChanged(AuthResource<User> userAuthResource) {
-                if(userAuthResource != null){
-                    switch (userAuthResource.status){
+                if (userAuthResource != null) {
+                    switch (userAuthResource.status) {
 
-                        case LOADING:{
+                        case LOADING: {
                             showProgressBar(true);
                             break;
                         }
 
-                        case AUTHENTICATED:{
+                        case AUTHENTICATED: {
                             showProgressBar(false);
                             Log.d(TAG, "onChanged: LOGIN SUCCESS: " + userAuthResource.data.getEmail());
                             onLoginSuccess();
                             break;
                         }
 
-                        case ERROR:{
+                        case ERROR: {
                             showProgressBar(false);
                             Toast.makeText(AuthActivity.this, userAuthResource.message
                                     + "\nDid you enter a number between 1 and 10?", Toast.LENGTH_SHORT).show();
                             break;
                         }
 
-                        case NOT_AUTHENTICATED:{
+                        case NOT_AUTHENTICATED: {
                             showProgressBar(false);
                             break;
                         }
@@ -95,33 +95,32 @@ RequestManager requestManager;
         });
     }
 
-    private void onLoginSuccess(){
+    private void onLoginSuccess() {
         Log.d(TAG, "onLoginSuccess: login successful!");
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
-    private void showProgressBar(boolean isVisible){
-        if(isVisible){
+    private void showProgressBar(boolean isVisible) {
+        if (isVisible) {
             progressBar.setVisibility(View.VISIBLE);
-        }
-        else{
+        } else {
             progressBar.setVisibility(View.GONE);
         }
     }
 
-    private void setLogo(){
+    private void setLogo() {
         requestManager
                 .load(logo)
-                .into((ImageView)findViewById(R.id.login_logo));
+                .into((ImageView) findViewById(R.id.login_logo));
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
 
-            case R.id.login_button:{
+            case R.id.login_button: {
 
                 attemptLogin();
                 break;
@@ -130,7 +129,7 @@ RequestManager requestManager;
     }
 
     private void attemptLogin() {
-        if(TextUtils.isEmpty(userId.getText().toString())){
+        if (TextUtils.isEmpty(userId.getText().toString())) {
             return;
         }
         viewModel.authenticateWithId(Integer.parseInt(userId.getText().toString()));
